@@ -1,0 +1,19 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "useGulp": false,
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.21.1",
+    "sdksVersions": {},
+    "version": "1.22.0",
+    "libraryName": "spdev",
+    "libraryId": "43dec01a-5547-4af6-ad2b-213d5b157722",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "spdev",
+    "solutionShortDescription": "spdev description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
