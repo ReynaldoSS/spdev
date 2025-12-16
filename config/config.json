@@ -17,11 +17,20 @@
           "manifest": "./src/webparts/newHelloWorld/NewHelloWorldWebPart.manifest.json"
         }
       ]
+    },
+    "react-function-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/reactFunction/ReactFunctionWebPart.js",
+          "manifest": "./src/webparts/reactFunction/ReactFunctionWebPart.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
   "localizedResources": {
     "HelloWorldWebPartStrings": "lib/webparts/helloWorld/loc/{locale}.js",
-    "NewHelloWorldWebPartStrings": "lib/webparts/newHelloWorld/loc/{locale}.js"
+    "NewHelloWorldWebPartStrings": "lib/webparts/newHelloWorld/loc/{locale}.js",
+    "ReactFunctionWebPartStrings": "lib/webparts/reactFunction/loc/{locale}.js"
   }
 }
