@@ -25,12 +25,21 @@
           "manifest": "./src/webparts/reactFunction/ReactFunctionWebPart.manifest.json"
         }
       ]
+    },
+    "react-query-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/reactQuery/ReactQueryWebPart.js",
+          "manifest": "./src/webparts/reactQuery/ReactQueryWebPart.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
   "localizedResources": {
     "HelloWorldWebPartStrings": "lib/webparts/helloWorld/loc/{locale}.js",
     "NewHelloWorldWebPartStrings": "lib/webparts/newHelloWorld/loc/{locale}.js",
-    "ReactFunctionWebPartStrings": "lib/webparts/reactFunction/loc/{locale}.js"
+    "ReactFunctionWebPartStrings": "lib/webparts/reactFunction/loc/{locale}.js",
+    "ReactQueryWebPartStrings": "lib/webparts/reactQuery/loc/{locale}.js"
   }
 }
