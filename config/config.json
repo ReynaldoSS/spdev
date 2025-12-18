@@ -33,6 +33,14 @@
           "manifest": "./src/webparts/reactQuery/ReactQueryWebPart.manifest.json"
         }
       ]
+    },
+    "crud-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/crud/CrudWebPart.js",
+          "manifest": "./src/webparts/crud/CrudWebPart.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
@@ -40,6 +48,7 @@
     "HelloWorldWebPartStrings": "lib/webparts/helloWorld/loc/{locale}.js",
     "NewHelloWorldWebPartStrings": "lib/webparts/newHelloWorld/loc/{locale}.js",
     "ReactFunctionWebPartStrings": "lib/webparts/reactFunction/loc/{locale}.js",
-    "ReactQueryWebPartStrings": "lib/webparts/reactQuery/loc/{locale}.js"
+    "ReactQueryWebPartStrings": "lib/webparts/reactQuery/loc/{locale}.js",
+    "CrudWebPartStrings": "lib/webparts/crud/loc/{locale}.js"
   }
 }

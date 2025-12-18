@@ -1,0 +1,29 @@
+@import '~@fluentui/react/dist/sass/References.scss';
+
+.crud {
+  background-color: #1e2628;
+  color: #d3d5d9;
+  .listTitle{
+    border-bottom: solid 2px #d3d5d9;
+  }
+}
+.list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  
+  &:hover {
+    background-color: #f9f9f9;
+  }
+}
+.crudPanel{
+  margin-top: 20px;
+}
