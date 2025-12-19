@@ -3,17 +3,31 @@ import styles from './Crud.module.scss';
 import type { ICrudProps } from './ICrudProps';
 import * as api from '../services/CRUDServices';
 import { useEffect, useState } from 'react';
-// Importamos Spinner e SpinnerSize
-import { Panel, PrimaryButton, DefaultButton, TextField, Stack, Spinner, SpinnerSize } from '@fluentui/react';
+// Adicionado Dialog e DialogType
+import { 
+  Panel, 
+  PrimaryButton, 
+  DefaultButton, 
+  TextField, 
+  Stack, 
+  Spinner, 
+  SpinnerSize, 
+  Dialog, 
+  DialogType, 
+  DialogFooter 
+} from '@fluentui/react';
 
 const Crud: React.FC<ICrudProps> = (props) => {
 
   const [items, setItems] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isSaving, setIsSaving] = useState<boolean>(false); // Novo estado para o salvamento
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
   const [idSelecionado, setIdSelecionado] = useState<number | null>(null);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
 
   const refreshData = async (): Promise<void> => {
     setLoading(true);
@@ -45,8 +59,7 @@ const Crud: React.FC<ICrudProps> = (props) => {
 
   const onSave = async () => {
     if (!inputValue) return;
-    
-    setIsSaving(true); // Inicia o estado de salvamento
+    setIsSaving(true);
     try {
       if (idSelecionado) {
         await api.updateItem(idSelecionado, inputValue);
@@ -59,23 +72,40 @@ const Crud: React.FC<ICrudProps> = (props) => {
     } catch (error) {
       console.error("Error saving item:", error);
     } finally {
-      setIsSaving(false); // Finaliza o estado de salvamento
+      setIsSaving(false);
     }
   }
 
-  const onDelete = async (id: number) => {
-    if (confirm('Are you sure you want to delete this item?')) {
-      await api.deleteItem(id);
-      await refreshData();
+  const openDeleteDialog = (id: number) => {
+    setItemToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setItemToDelete(null);
+    setIsDeleteDialogOpen(false);
+  };
+
+  const handleDelete = async () => {
+    if (itemToDelete !== null) {
+      setLoading(true); // Opcional: mostrar spinner na lista enquanto deleta
+      try {
+        await api.deleteItem(itemToDelete);
+        closeDeleteDialog();
+        await refreshData();
+      } catch (error) {
+        console.error("Error deleting item:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
+  };
 
   return (
     <div className={styles.crud}>
       <h3 className={styles.listTitle}>List Items</h3>
       <PrimaryButton onClick={onNew} text="New" iconProps={{ iconName: 'Add' }} />
       
-      {/* Spinner principal para o carregamento da lista */}
       {loading ? (
         <Spinner size={SpinnerSize.large} label="Loading data..." style={{ marginTop: '20px' }} />
       ) : (
@@ -86,7 +116,7 @@ const Crud: React.FC<ICrudProps> = (props) => {
               <div>
                 <DefaultButton onClick={() => onSelect(item)} text="Select" />
                 <DefaultButton 
-                  onClick={() => onDelete(item.Id)} 
+                  onClick={() => openDeleteDialog(item.Id)} // Chama o Dialog em vez do confirm()
                   text='Delete' 
                   styles={{ root: { color: 'red', marginLeft: '8px' } }}
                 />
@@ -95,20 +125,36 @@ const Crud: React.FC<ICrudProps> = (props) => {
           ))}
         </ul>
       )}
+      <Dialog
+        hidden={!isDeleteDialogOpen}
+        onDismiss={closeDeleteDialog}
+        dialogContentProps={{
+          type: DialogType.normal,
+          title: 'Delete Confirmation',
+          subText: 'Are you sure you want to delete this item? This action is permanent.'
+        }}
+        modalProps={{ isBlocking: true }}
+      >
+        <DialogFooter>
+          <PrimaryButton 
+            onClick={handleDelete} 
+            text="Yes, Delete" 
+            styles={{ root: { backgroundColor: '#d13438', border: 'none' } }} 
+          />
+          <DefaultButton onClick={closeDeleteDialog} text="Cancel" />
+        </DialogFooter>
+      </Dialog>
 
       <Panel
         isOpen={isOpen}
-        // Bloqueia fechar o modal enquanto estiver salvando
         onDismiss={() => !isSaving && setIsOpen(false)}
         headerText={idSelecionado ? 'Edit Item' : 'New Item'}
         closeButtonAriaLabel='Close'
       >
         <Stack tokens={{ childrenGap: 15 }} className={styles.crudPanel}>
           {isSaving ? (
-            // Exibe o Spinner dentro do painel durante o salvamento
             <Spinner size={SpinnerSize.large} label="Saving your changes..." style={{ marginTop: '40px' }} />
           ) : (
-            // Exibe o formulário normalmente se não estiver salvando
             <>
               <TextField
                 label='Title'
