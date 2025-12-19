@@ -3,7 +3,6 @@ import styles from './Crud.module.scss';
 import type { ICrudProps } from './ICrudProps';
 import * as api from '../services/CRUDServices';
 import { useEffect, useState } from 'react';
-// Adicionado Dialog e DialogType
 import { 
   Panel, 
   PrimaryButton, 
@@ -14,7 +13,9 @@ import {
   SpinnerSize, 
   Dialog, 
   DialogType, 
-  DialogFooter 
+  DialogFooter,
+  MessageBar,        // Novo import
+  MessageBarType     // Novo import
 } from '@fluentui/react';
 
 const Crud: React.FC<ICrudProps> = (props) => {
@@ -29,6 +30,15 @@ const Crud: React.FC<ICrudProps> = (props) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
 
+  // NOVO: Estado para gerenciar as notificações
+  const [notification, setNotification] = useState<{ message: string, type: MessageBarType } | null>(null);
+
+  // Função auxiliar para mostrar mensagem e esconder após 5s
+  const showNotification = (message: string, type: MessageBarType = MessageBarType.success) => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
+  };
+
   const refreshData = async (): Promise<void> => {
     setLoading(true);
     try {
@@ -36,6 +46,7 @@ const Crud: React.FC<ICrudProps> = (props) => {
       setItems(data);
     } catch (error) {
       console.error("Error fetching items:", error);
+      showNotification("Error loading items", MessageBarType.error);
     } finally {
       setLoading(false);
     }
@@ -63,14 +74,17 @@ const Crud: React.FC<ICrudProps> = (props) => {
     try {
       if (idSelecionado) {
         await api.updateItem(idSelecionado, inputValue);
+        showNotification("Item updated successfully!"); // Notificação de Alteração
       } else {
         await api.createItem(inputValue);
+        showNotification("New item created successfully!"); // Notificação de Inserção
       }
       setInputValue('');
       setIsOpen(false);
       await refreshData();
     } catch (error) {
       console.error("Error saving item:", error);
+      showNotification("Error while saving", MessageBarType.error);
     } finally {
       setIsSaving(false);
     }
@@ -88,13 +102,15 @@ const Crud: React.FC<ICrudProps> = (props) => {
 
   const handleDelete = async () => {
     if (itemToDelete !== null) {
-      setLoading(true); // Opcional: mostrar spinner na lista enquanto deleta
+      setLoading(true);
       try {
         await api.deleteItem(itemToDelete);
         closeDeleteDialog();
+        showNotification("Item deleted successfully!"); // Notificação de Deleção
         await refreshData();
       } catch (error) {
         console.error("Error deleting item:", error);
+        showNotification("Error while deleting", MessageBarType.error);
       } finally {
         setLoading(false);
       }
@@ -103,6 +119,21 @@ const Crud: React.FC<ICrudProps> = (props) => {
 
   return (
     <div className={styles.crud}>
+      
+      {/* RENDERIZAÇÃO DA NOTIFICAÇÃO */}
+      {notification && (
+        <div style={{ marginBottom: '15px' }}>
+          <MessageBar
+            messageBarType={notification.type}
+            isMultiline={false}
+            onDismiss={() => setNotification(null)}
+            dismissButtonAriaLabel="Close"
+          >
+            {notification.message}
+          </MessageBar>
+        </div>
+      )}
+
       <h3 className={styles.listTitle}>List Items</h3>
       <PrimaryButton onClick={onNew} text="New" iconProps={{ iconName: 'Add' }} />
       
@@ -116,7 +147,7 @@ const Crud: React.FC<ICrudProps> = (props) => {
               <div>
                 <DefaultButton onClick={() => onSelect(item)} text="Select" />
                 <DefaultButton 
-                  onClick={() => openDeleteDialog(item.Id)} // Chama o Dialog em vez do confirm()
+                  onClick={() => openDeleteDialog(item.Id)} 
                   text='Delete' 
                   styles={{ root: { color: 'red', marginLeft: '8px' } }}
                 />
@@ -125,6 +156,8 @@ const Crud: React.FC<ICrudProps> = (props) => {
           ))}
         </ul>
       )}
+
+      {/* DIALOG DE CONFIRMAÇÃO */}
       <Dialog
         hidden={!isDeleteDialogOpen}
         onDismiss={closeDeleteDialog}
@@ -145,6 +178,7 @@ const Crud: React.FC<ICrudProps> = (props) => {
         </DialogFooter>
       </Dialog>
 
+      {/* PAINEL DE CRIAÇÃO/EDIÇÃO */}
       <Panel
         isOpen={isOpen}
         onDismiss={() => !isSaving && setIsOpen(false)}
